@@ -26,7 +26,6 @@ services:
     pull_policy: never
     ports:
       - 8000:8080
-    user: wwwrun:www
     labels:
       traefik.enable: "true"
       traefik.http.routers.frontend.rule: "Host(`${NETBOX_HOSTNAME}`)"
@@ -42,11 +41,9 @@ services:
       traefik.http.services.frontend.loadbalancer.passhostheader: true
   netbox-worker:
     image: netbox:${TAG}
-    user: wwwrun:www
     pull_policy: never
   netbox-housekeeping:
     image: netbox:${TAG}
-    user: wwwrun:www
     pull_policy: never
   traefik:
     image: traefik:v2.8
