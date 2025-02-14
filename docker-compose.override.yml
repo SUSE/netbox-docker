@@ -39,12 +39,23 @@ services:
       traefik.http.middlewares.https_redirect.redirectscheme.permanent: true
       traefik.http.services.frontend.loadbalancer.server.port: 8080
       traefik.http.services.frontend.loadbalancer.passhostheader: true
+    volumes:
+      - /opt/netbox-data:/opt/netbox-data:ro
+      - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
   netbox-worker:
+    env_file: /etc/opt/netbox-docker/netbox.env
     image: netbox:${TAG}
     pull_policy: never
+    volumes:
+      - /opt/netbox-data:/opt/netbox-data:ro
+      - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
   netbox-housekeeping:
+    env_file: /etc/opt/netbox-docker/netbox.env
     image: netbox:${TAG}
     pull_policy: never
+    volumes:
+      - /opt/netbox-data:/opt/netbox-data:ro
+      - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
   traefik:
     image: traefik:v2.8
     container_name: traefik
