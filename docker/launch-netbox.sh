@@ -1,4 +1,6 @@
 #!/bin/bash
+/opt/netbox/launch-netbox-gunicorn.sh
+exit 1
 
 UNIT_CONFIG="${UNIT_CONFIG-/etc/unit/nginx-unit.json}"
 # Also used in "nginx-unit.json"

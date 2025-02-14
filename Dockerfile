@@ -1,38 +1,30 @@
 ARG FROM
 FROM ${FROM} AS builder
 
-RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt-get update -qq \
-    && apt-get upgrade \
-      --yes -qq --no-install-recommends \
-    && apt-get install \
-      --yes -qq --no-install-recommends \
-      build-essential \
-      ca-certificates \
-      libldap-dev \
-      libpq-dev \
-      libsasl2-dev \
-      libssl-dev \
-      libxml2-dev \
-      libxmlsec1 \
-      libxmlsec1-dev \
-      libxmlsec1-openssl \
-      libxslt-dev \
-      pkg-config \
-      python3-dev \
-      python3-pip \
-      python3-venv \
+RUN \
+    zypper -n in \
+      gcc \
+      openldap2-devel \
+      postgresql-devel \
+      postgresql-server-devel \
+      cyrus-sasl-devel \
+      libopenssl-devel \
+      libxml2-devel \
+      libxml-security-c-devel \
+      libxmlsec1-openssl1 \
+      libxslt-devel \
+      xmlsec1-devel \
+      libtool \
     && python3 -m venv /opt/netbox/venv \
     && /opt/netbox/venv/bin/python3 -m pip install --upgrade \
       pip \
       setuptools \
-      wheel
+      wheel \
+    && zypper -n cc -a && rm -r /var/{cache,log}/*
 
 ARG NETBOX_PATH
 COPY ${NETBOX_PATH}/requirements.txt requirements-container.txt /
 RUN \
-    # Gunicorn is not needed because we use Nginx Unit
-    sed -i -e '/gunicorn/d' /requirements.txt && \
     # We need 'social-auth-core[all]' in the Docker image. But if we put it in our own requirements-container.txt
     # we have potential version conflicts and the build will fail.
     # That's why we just replace it in the original requirements.txt.
@@ -48,32 +40,15 @@ RUN \
 ARG FROM
 FROM ${FROM} AS main
 
-RUN export DEBIAN_FRONTEND=noninteractive \
-    && apt-get update -qq \
-    && apt-get upgrade \
-      --yes -qq --no-install-recommends \
-    && apt-get install \
-      --yes -qq --no-install-recommends \
+RUN \
+    zypper -n in \
       bzip2 \
-      ca-certificates \
-      curl \
-      libldap-common \
       libpq5 \
-      libxmlsec1-openssl \
-      openssh-client \
-      openssl \
-      python3 \
-      tini \
-    && curl --silent --output /usr/share/keyrings/nginx-keyring.gpg \
-      https://unit.nginx.org/keys/nginx-keyring.gpg \
-    && echo "deb [signed-by=/usr/share/keyrings/nginx-keyring.gpg] https://packages.nginx.org/unit/ubuntu/ noble unit" \
-      > /etc/apt/sources.list.d/unit.list \
-    && apt-get update -qq \
-    && apt-get install \
-      --yes -qq --no-install-recommends \
-      unit=1.34.0-1~noble \
-      unit-python3.12=1.34.0-1~noble \
-    && rm -rf /var/lib/apt/lists/*
+      libxmlsec1-openssl1 \
+      openssh-clients \
+      catatonit \
+      system-user-wwwrun \
+    && zypper -n cc -a && rm -r /var/{cache,log}/*
 
 COPY --from=builder /opt/netbox/venv /opt/netbox/venv
 
@@ -90,19 +65,34 @@ COPY docker/launch-netbox.sh /opt/netbox/launch-netbox.sh
 COPY configuration/ /etc/netbox/config/
 COPY docker/nginx-unit.json /etc/unit/
 
+COPY docker/launch-netbox-gunicorn.sh /opt/netbox/
+
+# Plugins and plugin configuration
+COPY ./plugin_requirements.txt /opt/netbox/
+COPY configuration/configuration.py /etc/netbox/config/configuration.py
+COPY configuration/plugins.py /etc/netbox/config/plugins.py
+
+# Plugin configuration only possible via settings.py
+COPY ./local_settings.py /opt/netbox/netbox/netbox/
+
+# Install plugins
+RUN /opt/netbox/venv/bin/pip install  --no-warn-script-location -r /opt/netbox/plugin_requirements.txt
+
+RUN printf 'MIDDLEWARE = MIDDLEWARE + ["whitenoise.middleware.WhiteNoiseMiddleware"]\nSTATIC_ROOT = "/opt/netbox/netbox/static"\nSTATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"' >> /opt/netbox/netbox/netbox/settings.py
+
 WORKDIR /opt/netbox/netbox
 
 # Must set permissions for '/opt/netbox/netbox/media' directory
 # to g+w so that pictures can be uploaded to netbox.
 RUN mkdir -p static /opt/unit/state/ /opt/unit/tmp/ \
-      && chown -R unit:root /opt/unit/ media reports scripts \
+      && chown -R wwwrun:root /opt/unit/ media reports scripts \
       && chmod -R g+w /opt/unit/ media reports scripts \
       && cd /opt/netbox/ && SECRET_KEY="dummyKeyWithMinimumLength-------------------------" /opt/netbox/venv/bin/python -m mkdocs build \
           --config-file /opt/netbox/mkdocs.yml --site-dir /opt/netbox/netbox/project-static/docs/ \
       && SECRET_KEY="dummyKeyWithMinimumLength-------------------------" /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py collectstatic --no-input
 
 ENV LANG=C.utf8 PATH=/opt/netbox/venv/bin:$PATH
-ENTRYPOINT [ "/usr/bin/tini", "--" ]
+ENTRYPOINT [ "catatonit", "--" ]
 
 CMD [ "/opt/netbox/docker-entrypoint.sh", "/opt/netbox/launch-netbox.sh" ]
 
