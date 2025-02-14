@@ -40,9 +40,11 @@ services:
       traefik.http.services.frontend.loadbalancer.server.port: 8080
       traefik.http.services.frontend.loadbalancer.passhostheader: true
   netbox-worker:
+    env_file: /etc/opt/netbox-docker/netbox.env
     image: netbox:${TAG}
     pull_policy: never
   netbox-housekeeping:
+    env_file: /etc/opt/netbox-docker/netbox.env
     image: netbox:${TAG}
     pull_policy: never
   traefik:
