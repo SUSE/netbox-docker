@@ -42,6 +42,7 @@ services:
     volumes:
       - /opt/netbox-data:/opt/netbox-data:ro
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
+    restart: unless-stopped
   netbox-worker:
     env_file: /etc/opt/netbox-docker/netbox.env
     image: netbox:${TAG}
@@ -49,6 +50,7 @@ services:
     volumes:
       - /opt/netbox-data:/opt/netbox-data:ro
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
+    restart: unless-stopped
   netbox-housekeeping:
     env_file: /etc/opt/netbox-docker/netbox.env
     image: netbox:${TAG}
@@ -56,6 +58,7 @@ services:
     volumes:
       - /opt/netbox-data:/opt/netbox-data:ro
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
+    restart: unless-stopped
   traefik:
     image: traefik:v2.8
     container_name: traefik
@@ -81,5 +84,7 @@ services:
     restart: unless-stopped
   redis:
     env_file: /etc/opt/netbox-docker/redis.env
+    restart: unless-stopped
   redis-cache:
     env_file: /etc/opt/netbox-docker/redis-cache.env
+    restart: unless-stopped
