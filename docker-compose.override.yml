@@ -42,6 +42,10 @@ services:
     volumes:
       - /opt/netbox-data:/opt/netbox-data:ro
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
+      - ./branding/SUSE_NetBox_Neg.svg:/opt/netbox/netbox/project-static/img/logo_netbox_bright_teal.svg:ro
+      - ./branding/SUSE_NetBox_Neg.svg:/opt/netbox/netbox/static/logo_netbox_bright_teal.svg:ro
+      - ./branding/SUSE_NetBox_Pos.svg:/opt/netbox/netbox/project-static/img/logo_netbox_dark_teal.svg:ro
+      - ./branding/SUSE_NetBox_Pos.svg:/opt/netbox/netbox/static/logo_netbox_dark_teal.svg:ro
     restart: unless-stopped
   netbox-worker:
     env_file: /etc/opt/netbox-docker/netbox.env
