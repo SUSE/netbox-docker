@@ -28,13 +28,16 @@ services:
       - 8000:8080
     labels:
       traefik.enable: "true"
-      traefik.http.routers.frontend.rule: "Host(`${NETBOX_HOSTNAME}`)"
+      traefik.http.routers.frontend.rule: "Host(`${NETBOX_FRONTEND_HOST}`) || Host(`${NETBOX_BACKEND_HOST}`)"
       traefik.http.routers.frontend.entrypoints: web
       traefik.http.routers.frontend.middlewares: https_redirect
-      traefik.http.routers.frontendtls.rule: "Host(`${NETBOX_HOSTNAME}`)"
+      traefik.http.routers.backendtls.rule: "Host(`${NETBOX_BACKEND_HOST}`)"
+      traefik.http.routers.backendtls.entrypoints: websecure
+      traefik.http.routers.backendtls.tls: true
+      traefik.http.routers.backendtls.tls.certresolver: myresolver
+      traefik.http.routers.frontendtls.rule: "Host(`${NETBOX_FRONTEND_HOST}`)"
       traefik.http.routers.frontendtls.entrypoints: websecure
       traefik.http.routers.frontendtls.tls: true
-      traefik.http.routers.frontendtls.tls.certresolver: myresolver
       traefik.http.middlewares.https_redirect.redirectscheme.scheme: https
       traefik.http.middlewares.https_redirect.redirectscheme.permanent: true
       traefik.http.services.frontend.loadbalancer.server.port: 8080
@@ -47,6 +50,12 @@ services:
       - ./branding/SUSE_NetBox_Pos.svg:/opt/netbox/netbox/project-static/img/logo_netbox_dark_teal.svg:ro
       - ./branding/SUSE_NetBox_Pos.svg:/opt/netbox/netbox/static/logo_netbox_dark_teal.svg:ro
     restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - curl
+        - "-f"
+        - http://127.0.0.1:8080/api/status/?format=json
   netbox-worker:
     env_file: /etc/opt/netbox-docker/netbox.env
     image: netbox:${TAG}
