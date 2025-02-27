@@ -233,6 +233,10 @@ LOGIN_TIMEOUT = _environ_get_and_map('LOGIN_TIMEOUT', 1209600, _AS_INT)
 if 'MAINTENANCE_MODE' in environ:
     MAINTENANCE_MODE = _environ_get_and_map('MAINTENANCE_MODE', None, _AS_BOOL)
 
+if MAINTENANCE_MODE and environ.get('SESSIONS_ROOT', None) is None:
+    print("Defaulting SESSIONS_ROOT to /tmp due to MAINTENANCE_MODE enabled")
+    environ.set('SESSIONS_ROOT', '/tmp')
+
 # Maps provider
 if 'MAPS_URL' in environ:
     MAPS_URL = environ.get('MAPS_URL', None)
