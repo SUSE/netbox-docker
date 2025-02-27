@@ -51,12 +51,6 @@ services:
       - ./branding/SUSE_NetBox_Pos.svg:/opt/netbox/netbox/static/logo_netbox_dark_teal.svg:ro
       - ./templates/login.html:/opt/netbox/netbox/templates/login.html
     restart: unless-stopped
-    healthcheck:
-      test:
-        - CMD
-        - curl
-        - "-f"
-        - http://127.0.0.1:8080/api/status/?format=json
   netbox-worker:
     env_file: /etc/opt/netbox-docker/netbox.env
     image: netbox:${TAG}
