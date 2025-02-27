@@ -49,6 +49,7 @@ services:
       - ./branding/SUSE_NetBox_Neg.svg:/opt/netbox/netbox/static/logo_netbox_bright_teal.svg:ro
       - ./branding/SUSE_NetBox_Pos.svg:/opt/netbox/netbox/project-static/img/logo_netbox_dark_teal.svg:ro
       - ./branding/SUSE_NetBox_Pos.svg:/opt/netbox/netbox/static/logo_netbox_dark_teal.svg:ro
+      - ./templates/login.html:/opt/netbox/netbox/templates/login.html
     restart: unless-stopped
     healthcheck:
       test:
