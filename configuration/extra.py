@@ -152,3 +152,10 @@ DEFAULT_DASHBOARD = [
         }
     },
 ]
+
+FIELD_CHOICES = {
+    'netbox_documents.DocTypeChoices.device': (
+        ('manual', 'Manual', 'pink'),
+        ('purchaseorder', 'Purchase Order', 'orange'),
+    ),
+}
