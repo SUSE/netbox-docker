@@ -43,7 +43,10 @@ services:
       traefik.http.services.frontend.loadbalancer.server.port: 8080
       traefik.http.services.frontend.loadbalancer.passhostheader: true
     volumes:
-      - /opt/netbox-data:/opt/netbox-data:ro
+      - /var/opt/netbox/data-source:/var/opt/netbox/data-source:ro
+      - /var/opt/netbox/media:/opt/netbox/netbox/media:rw
+      - /var/opt/netbox/reports:/opt/netbox/netbox/reports:rw
+      - /var/opt/netbox/scripts:/opt/netbox/netbox/scripts:rw
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
       - ./branding/SUSE_NetBox_Neg.svg:/opt/netbox/netbox/project-static/img/logo_netbox_bright_teal.svg:ro
       - ./branding/SUSE_NetBox_Neg.svg:/opt/netbox/netbox/static/logo_netbox_bright_teal.svg:ro
@@ -56,7 +59,7 @@ services:
     image: netbox:${TAG}
     pull_policy: never
     volumes:
-      - /opt/netbox-data:/opt/netbox-data:ro
+      - /var/opt/netbox/data-source:/var/opt/netbox/data-source:ro
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
     restart: unless-stopped
   netbox-housekeeping:
@@ -64,7 +67,7 @@ services:
     image: netbox:${TAG}
     pull_policy: never
     volumes:
-      - /opt/netbox-data:/opt/netbox-data:ro
+      - /var/opt/netbox/data-source:/var/opt/netbox/data-source:ro
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
     restart: unless-stopped
   traefik:
