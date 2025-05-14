@@ -32,6 +32,8 @@ RUN \
     # we have potential version conflicts and the build will fail.
     # That's why we just replace it in the original requirements.txt.
     sed -i -e 's/social-auth-core/social-auth-core\[all\]/g' /requirements.txt && \
+    # The same is true for 'django-storages'
+    sed -i -e 's/django-storages/django-storages\[azure,boto3,dropbox,google,libcloud,sftp\]/g' /requirements.txt && \
     /opt/netbox/venv/bin/pip install \
       -r /requirements.txt \
       -r /requirements-container.txt
