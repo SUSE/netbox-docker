@@ -1,0 +1,2 @@
+# pending https://github.com/revsys/django-health-check/pull/478
+git+https://github.com/tacerus/django-health-check@suse-main
