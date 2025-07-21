@@ -61,6 +61,8 @@ RUN \
 COPY --from=builder /requirements.txt /requirements-container.txt /opt/netbox/
 COPY --from=builder /opt/netbox/venv /opt/netbox/venv
 
+COPY patch_requirements.txt /tmp/
+
 ARG NETBOX_PATH
 COPY ${NETBOX_PATH} /opt/netbox
 
@@ -83,6 +85,9 @@ COPY ./local_settings.py /opt/netbox/netbox/netbox/
 
 # Install plugins
 RUN /opt/netbox/venv/bin/pip install  --no-warn-script-location -r /opt/netbox/plugin_requirements.txt
+
+# can't use constraints feature above due to conflict in subdependency, hence install patched dependencies separately, replacing the unpatched ones
+RUN /opt/netbox/venv/bin/pip install -r /tmp/patch_requirements.txt
 
 WORKDIR /opt/netbox/netbox
 
