@@ -76,7 +76,7 @@
   "access_log": "/dev/stdout",
   "settings": {
     "http": {
-      "max_body_size": 33554432
+      "max_body_size": 104857600
     }
   }
 }
