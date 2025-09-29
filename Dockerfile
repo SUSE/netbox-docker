@@ -69,7 +69,6 @@ COPY ${NETBOX_PATH} /opt/netbox
 COPY docker/configuration.docker.py /opt/netbox/netbox/netbox/configuration.py
 COPY docker/ldap_config.docker.py /opt/netbox/netbox/netbox/ldap_config.py
 COPY docker/docker-entrypoint.sh /opt/netbox/docker-entrypoint.sh
-COPY docker/housekeeping.sh /opt/netbox/housekeeping.sh
 COPY docker/launch-netbox.sh /opt/netbox/launch-netbox.sh
 COPY configuration/ /etc/netbox/config/
 COPY docker/nginx-unit.json /etc/unit/
@@ -93,7 +92,7 @@ WORKDIR /opt/netbox/netbox
 
 # Must set permissions for '/opt/netbox/netbox/media' directory
 # to g+w so that pictures can be uploaded to netbox.
-RUN mkdir -p static /opt/unit/state/ /opt/unit/tmp/ \
+RUN mkdir -p static media /opt/unit/state/ /opt/unit/tmp/ \
       && chown -R unit:root /opt/unit/ media reports scripts \
       && chmod -R g+w /opt/unit/ media reports scripts \
       && cd /opt/netbox/ && SECRET_KEY="dummyKeyWithMinimumLength-------------------------" /opt/netbox/venv/bin/python -m mkdocs build \
