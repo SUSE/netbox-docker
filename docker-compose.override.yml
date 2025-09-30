@@ -62,14 +62,6 @@ services:
       - /var/opt/netbox/data-source:/var/opt/netbox/data-source:ro
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
     restart: unless-stopped
-  netbox-housekeeping:
-    env_file: /etc/opt/netbox-docker/netbox.env
-    image: netbox:${TAG}
-    pull_policy: never
-    volumes:
-      - /var/opt/netbox/data-source:/var/opt/netbox/data-source:ro
-      - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
-    restart: unless-stopped
   traefik:
     image: traefik:v2.8
     container_name: traefik
