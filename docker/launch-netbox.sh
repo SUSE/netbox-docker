@@ -15,6 +15,7 @@ exec granian \
   --working-dir "/opt/netbox/netbox/" \
   --static-path-route "/static" \
   --static-path-mount "/opt/netbox/netbox/static/" \
+  --static-path-dir-to-file index.html \
   --pid-file "/tmp/granian.pid" \
   "${GRANIAN_EXTRA_ARGS[@]}" \
   "netbox.granian:application"
