@@ -17,7 +17,7 @@ services:
     env_file: /etc/opt/netbox-docker/netbox.env
     build:
       args:
-        FROM: registry.suse.com/bci/python:3.11
+        FROM: registry.suse.com/bci/python:3.13
         NETBOX_PATH: ${NETBOX_PATH}
       context: .
       dockerfile: Dockerfile

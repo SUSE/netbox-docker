@@ -26,7 +26,7 @@ ARG NETBOX_PATH
 COPY ${NETBOX_PATH}/requirements.txt requirements-container.txt /
 ENV VIRTUAL_ENV=/opt/netbox/venv
 RUN \
-    # Gunicorn is not needed because we use Nginx Unit
+    # Gunicorn is not needed because we use Granian
     sed -i -e '/gunicorn/d' /requirements.txt && \
     # We need 'social-auth-core[all]' in the Docker image. But if we put it in our own requirements-container.txt
     # we have potential version conflicts and the build will fail.
@@ -61,8 +61,6 @@ RUN \
 COPY --from=builder /requirements.txt /requirements-container.txt /opt/netbox/
 COPY --from=builder /opt/netbox/venv /opt/netbox/venv
 
-COPY patch_requirements.txt /tmp/
-
 ARG NETBOX_PATH
 COPY ${NETBOX_PATH} /opt/netbox
 
@@ -70,8 +68,9 @@ COPY docker/configuration.docker.py /opt/netbox/netbox/netbox/configuration.py
 COPY docker/ldap_config.docker.py /opt/netbox/netbox/netbox/ldap_config.py
 COPY docker/docker-entrypoint.sh /opt/netbox/docker-entrypoint.sh
 COPY docker/launch-netbox.sh /opt/netbox/launch-netbox.sh
+COPY docker/super_user.py /opt/netbox/super_user.py
 COPY configuration/ /etc/netbox/config/
-COPY docker/nginx-unit.json /etc/unit/
+COPY docker/granian.py /opt/netbox/netbox/netbox/granian.py
 COPY VERSION /opt/netbox/VERSION
 
 # Plugins and plugin configuration
@@ -85,21 +84,18 @@ COPY ./local_settings.py /opt/netbox/netbox/netbox/
 # Install plugins
 RUN /opt/netbox/venv/bin/pip install  --no-warn-script-location -r /opt/netbox/plugin_requirements.txt
 
-# can't use constraints feature above due to conflict in subdependency, hence install patched dependencies separately, replacing the unpatched ones
-RUN /opt/netbox/venv/bin/pip install -r /tmp/patch_requirements.txt
-
 WORKDIR /opt/netbox/netbox
 
 # Must set permissions for '/opt/netbox/netbox/media' directory
 # to g+w so that pictures can be uploaded to netbox.
-RUN mkdir -p static media /opt/unit/state/ /opt/unit/tmp/ \
-      && chown -R unit:root /opt/unit/ media reports scripts \
-      && chmod -R g+w /opt/unit/ media reports scripts \
-      && cd /opt/netbox/ && SECRET_KEY="dummyKeyWithMinimumLength-------------------------" /opt/netbox/venv/bin/python -m mkdocs build \
-          --config-file /opt/netbox/mkdocs.yml --site-dir /opt/netbox/netbox/project-static/docs/ \
-      && DEBUG="true" SECRET_KEY="dummyKeyWithMinimumLength-------------------------" /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py collectstatic --no-input \
-      && mkdir /opt/netbox/netbox/local \
-      && echo "build: Docker-$(cat /opt/netbox/VERSION)" > /opt/netbox/netbox/local/release.yaml
+RUN useradd --home-dir /opt/netbox/ --no-create-home --no-user-group --system --shell /bin/false --uid 999 --gid 0 netbox \
+    && mkdir -p static media local \
+    && chown -R netbox:root media reports scripts \
+    && chmod -R g+w media reports scripts \
+    && cd /opt/netbox/ && SECRET_KEY="dummyKeyWithMinimumLength-------------------------" /opt/netbox/venv/bin/python -m mkdocs build \
+        --config-file /opt/netbox/mkdocs.yml --site-dir /opt/netbox/netbox/project-static/docs/ \
+    && DEBUG="true" SECRET_KEY="dummyKeyWithMinimumLength-------------------------" /opt/netbox/venv/bin/python /opt/netbox/netbox/manage.py collectstatic --no-input \
+    && echo "build: Docker-$(cat /opt/netbox/VERSION)" > /opt/netbox/netbox/local/release.yaml
 
 ENV LANG=C.utf8 PATH=/opt/netbox/venv/bin:$PATH VIRTUAL_ENV=/opt/netbox/venv UV_NO_CACHE=1
 ENTRYPOINT [ "catatonit", "--" ]
