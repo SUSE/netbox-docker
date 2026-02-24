@@ -33,11 +33,7 @@
                   <a href="{{ backend.url }}" class="btn w-100">
                     {% if backend.icon_name %}<i class="mdi mdi-{{ backend.icon_name }}"></i>
                     {% elif backend.icon_img %}<img src="{{ backend.icon_img }}" height="24"{% if backend.display_name %}class="me-2 sso-icon" {% endif %}/>{% endif %}
-                    {% if backend.display_name == 'opensuse' %}
-                    Log in with openSUSE IDP
-                    {% else %}
                     {{ backend.display_name }}
-                    {% endif %}
                   </a>
                 </div>
               {% endfor %}

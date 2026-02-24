@@ -175,3 +175,7 @@ FIELD_CHOICES = {
         ('warranty', 'Warranty information or RMA', 'red'),
     ),
 }
+
+SOCIAL_AUTH_BACKEND_ATTRS = {
+    'oidc': ('Log in with SUSEID', 'login'),
+}
