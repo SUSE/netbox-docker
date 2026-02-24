@@ -388,4 +388,6 @@ SOCIAL_AUTH_PIPELINE = (
     'netbox.authentication.user_default_groups_handler',
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
+    # OIDC Customizations
+    'netbox.custom_pipeline.update_groups',
 )
