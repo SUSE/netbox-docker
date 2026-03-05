@@ -52,9 +52,6 @@ RUN \
       libxmlsec1-openssl1 \
       openssh-clients \
       catatonit \
-    && zypper -n ar -G -f -p 100 https://packages.nginx.org/unit/fedora/38/x86_64/ nginx-unit \
-    && zypper -n in \
-      unit-python311 \
     && zypper -n cc -a && rm -r /var/{cache,log}/*
 
 # Copy the modified 'requirements*.txt' files, to have the files actually used during installation
