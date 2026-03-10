@@ -1,7 +1,7 @@
 #!/bin/bash
 # Runs on every start of the NetBox Docker container
 
-# Stop when an error occures
+# Stop when an error occurs
 set -e
 
 # Allows NetBox to be run as non-root users
@@ -57,6 +57,14 @@ else
   ./manage.py shell --no-startup --no-imports --interface python \
     </opt/netbox/super_user.py
 fi
+
+echo "⚙️ Applying user hooks"
+
+shopt -s nullglob
+for f in /opt/netbox/hooks/startup.d/*.py; do
+  ./manage.py shell --no-startup --no-imports --interface python \
+    <"$f"
+done
 
 echo "✅ Initialisation is done."
 
