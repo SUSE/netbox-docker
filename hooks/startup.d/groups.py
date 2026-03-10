@@ -184,7 +184,6 @@ user_rw_objects = common_objects.union({
 )
 
 user_ro_objects = {
-    'core.objectchange',
     'extras.tag',
     'extras.customfield',
     'tenancy.tenantgroup',
