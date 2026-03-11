@@ -162,6 +162,7 @@ DEFAULT_DASHBOARD = [
 
 FIELD_CHOICES = {
     'dcim.Device.status+': (
+        ('disposed', 'Disposed of', 'orange'),
         ('unused', 'Active, Unused', 'teal'),
     ),
     'netbox_documents.DocTypeChoices.device': (
