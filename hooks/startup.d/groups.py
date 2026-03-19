@@ -2,11 +2,17 @@ from core.models import ObjectType
 from users.models import Group, ObjectPermission
 from django.apps import apps
 
-group_admins, _ = Group.objects.get_or_create(name='admins')
-group_users, _ = Group.objects.get_or_create(name='default-users')
+groups = {
+        'admins': None,
+        'default-users': None,
+}
 
-group_admins.save()
-group_users.save()
+for group in Group.objects.all():
+    if group.name not in groups:
+        group.delete()
+
+for group in groups:
+    groups[group], _ = Group.objects.get_or_create(name=group)
 
 def name_to_object(name: str):
     try:
@@ -193,11 +199,37 @@ user_ro_objects = {
     'tenancy.tenantgroup',
 }
 
-actions_readonly = {'view'}
 actions_edit = {'view', 'add', 'change'}
-actions_edit_delete = actions_edit | {'delete'}
 
-create_permission(name='root', actions=actions_edit, objects=root_objects, groups={group_admins})
-create_permission(name='user-rw', actions=actions_edit, objects=protected_objects, groups={group_users})
-create_permission(name='user-rwd', actions=actions_edit_delete, objects=user_rw_objects, groups={group_users})
-create_permission(name='user-ro', actions=actions_readonly, objects=user_ro_objects, groups={group_users})
+permissions = {
+        'root': {
+            'actions': actions_edit,
+            'objects': root_objects,
+            'groups': {groups['admins']},
+        },
+        'user-rw': {
+            'actions': actions_edit,
+            'objects': protected_objects,
+            'groups': {groups['default-users']},
+        },
+        'user-rwd': {
+            'actions': actions_edit | {'delete'},
+            'objects': user_rw_objects,
+            'groups': {groups['default-users']},
+        },
+        'user-ro': {
+            'actions': {'view'},
+            'objects': user_ro_objects,
+            'groups': {groups['default-users']},
+        },
+}
+
+for permission in ObjectPermission.objects.all():
+    if permission.name not in permissions:
+        permission.delete()
+
+for permission, permission_data in permissions.items():
+    create_permission(
+            name=permission,
+            **permission_data,
+    )
