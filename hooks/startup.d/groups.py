@@ -7,9 +7,12 @@ groups = {
         'default-users': None,
 }
 
+found_groups = []
 for group in Group.objects.all():
-    if group.name not in groups:
+    if group.name not in groups or group.name in found_groups:
         group.delete()
+    found_groups.append(group.name)
+del found_groups
 
 for group in groups:
     groups[group], _ = Group.objects.get_or_create(name=group)
@@ -224,9 +227,12 @@ permissions = {
         },
 }
 
+found_permissions = []
 for permission in ObjectPermission.objects.all():
-    if permission.name not in permissions:
+    if permission.name not in permissions or permission.name in found_permissions:
         permission.delete()
+    found_permissions.append(permission.name)
+del found_permissions
 
 for permission, permission_data in permissions.items():
     create_permission(
