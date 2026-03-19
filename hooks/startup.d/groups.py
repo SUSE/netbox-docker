@@ -35,7 +35,6 @@ common_objects = {
     'dcim.poweroutlettemplate',
     'tenancy.contact',
     'dcim.inventoryitemtemplate',
-    'dcim.device',
     'dcim.rack',
     'virtualization.cluster',
     'dcim.devicebaytemplate',
@@ -88,7 +87,6 @@ common_objects = {
     'ipam.vlangroup',
     'dcim.consoleserverporttemplate',
     'tenancy.contactassignment',
-    'virtualization.virtualmachine',
     'ipam.routetarget',
     'dcim.manufacturer',
     'virtualization.virtualdisk',
@@ -121,7 +119,12 @@ common_objects = {
     'dcim.devicerole'
 }
 
-root_objects = common_objects.union({
+protected_objects = {
+    'dcim.device',
+    'virtualization.virtualmachine',
+}
+
+root_objects = common_objects | protected_objects | {
     'extras.webhook',
     'extras.customlink',
     'core.datafile',
@@ -173,7 +176,7 @@ root_objects = common_objects.union({
     'extras.taggeditem',
     'social_django.usersocialauth',
     'core.autosyncrecord'
-})
+}
 
 user_rw_objects = common_objects.union({
     'netbox_documents.devicetypedocument',
@@ -191,8 +194,10 @@ user_ro_objects = {
 }
 
 actions_readonly = {'view'}
-actions_edit = {'view', 'add', 'change', 'delete' }
+actions_edit = {'view', 'add', 'change'}
+actions_edit_delete = actions_edit | {'delete'}
 
 create_permission(name='root', actions=actions_edit, objects=root_objects, groups={group_admins})
-create_permission(name='user-rw', actions=actions_edit, objects=user_rw_objects, groups={group_users})
+create_permission(name='user-rw', actions=actions_edit, objects=protected_objects, groups={group_users})
+create_permission(name='user-rwd', actions=actions_edit_delete, objects=user_rw_objects, groups={group_users})
 create_permission(name='user-ro', actions=actions_readonly, objects=user_ro_objects, groups={group_users})
