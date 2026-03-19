@@ -17,9 +17,9 @@ def name_to_object(name: str):
 
 def create_permission(name: str, actions: set[str], objects: set[str], groups: set[Group]):
     # Check if it already exists
-    objectpermission,_ = ObjectPermission.objects.get_or_create(
+    objectpermission, _ = ObjectPermission.objects.update_or_create(
         name=name,
-        actions=list(actions),
+        defaults={'actions': list(actions)},
     )
     objectpermission.object_types.set([ name_to_object(x) for x in objects if  name_to_object(x) is not None])
     # Save to make sure the object has an id before adding group relationships
