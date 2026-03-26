@@ -2,11 +2,20 @@ from core.models import ObjectType
 from users.models import Group, ObjectPermission
 from django.apps import apps
 
-group_admins, _ = Group.objects.get_or_create(name='admins')
-group_users, _ = Group.objects.get_or_create(name='default-users')
+groups = {
+        'admins': None,
+        'default-users': None,
+}
 
-group_admins.save()
-group_users.save()
+found_groups = []
+for group in Group.objects.all():
+    if group.name not in groups or group.name in found_groups:
+        group.delete()
+    found_groups.append(group.name)
+del found_groups
+
+for group in groups:
+    groups[group], _ = Group.objects.get_or_create(name=group)
 
 def name_to_object(name: str):
     try:
@@ -17,9 +26,9 @@ def name_to_object(name: str):
 
 def create_permission(name: str, actions: set[str], objects: set[str], groups: set[Group]):
     # Check if it already exists
-    objectpermission,_ = ObjectPermission.objects.get_or_create(
+    objectpermission, _ = ObjectPermission.objects.update_or_create(
         name=name,
-        actions=list(actions),
+        defaults={'actions': list(actions)},
     )
     objectpermission.object_types.set([ name_to_object(x) for x in objects if  name_to_object(x) is not None])
     # Save to make sure the object has an id before adding group relationships
@@ -32,167 +41,201 @@ def create_permission(name: str, actions: set[str], objects: set[str], groups: s
 
 
 common_objects = {
-    'dcim.poweroutlettemplate',
-    'tenancy.contact',
-    'dcim.inventoryitemtemplate',
-    'dcim.device',
-    'dcim.rack',
-    'virtualization.cluster',
-    'dcim.devicebaytemplate',
-    'dcim.platform',
-    'dcim.cabletermination',
-    'dcim.interface',
-    'ipam.vlan',
-    'dcim.rearport',
-    'dcim.frontporttemplate',
-    'dcim.frontport',
-    'dcim.sitegroup',
-    'dcim.cablepath',
-    'dcim.site',
+    'circuits.circuit',
+    'circuits.circuitgroup',
+    'circuits.circuitgroupassignment',
+    'circuits.circuittermination',
+    'circuits.circuittype',
+    'circuits.provider',
+    'circuits.provideraccount',
+    'circuits.providernetwork',
+    'circuits.virtualcircuit',
+    'circuits.virtualcircuittermination',
     'circuits.virtualcircuittype',
-    'extras.journalentry',
+    'dcim.cable',
+    'dcim.cablepath',
+    'dcim.cabletermination',
+    'dcim.consoleport',
+    'dcim.consoleporttemplate',
+    'dcim.consoleserverport',
+    'dcim.consoleserverporttemplate',
+    'dcim.devicebay',
+    'dcim.devicebaytemplate',
+    'dcim.devicerole',
+    'dcim.devicetype',
+    'dcim.frontport',
+    'dcim.frontporttemplate',
+    'dcim.interface',
+    'dcim.interfacetemplate',
     'dcim.inventoryitem',
-    'dcim.powerporttemplate',
+    'dcim.inventoryitemrole',
+    'dcim.inventoryitemtemplate',
+    'dcim.location',
+    'dcim.macaddress',
+    'dcim.manufacturer',
+    'dcim.module',
+    'dcim.modulebay',
+    'dcim.modulebaytemplate',
     'dcim.moduletype',
+    'dcim.platform',
+    'dcim.powerfeed',
     'dcim.poweroutlet',
+    'dcim.poweroutlettemplate',
+    'dcim.powerpanel',
+    'dcim.powerport',
+    'dcim.powerporttemplate',
+    'dcim.rack',
+    'dcim.rackreservation',
+    'dcim.rackrole',
+    'dcim.racktype',
+    'dcim.rearport',
+    'dcim.rearporttemplate',
+    'dcim.region',
+    'dcim.site',
+    'dcim.sitegroup',
+    'dcim.virtualchassis',
+    'dcim.virtualdevicecontext',
+    'django_rq.queue',
+    'extras.customfieldchoiceset',
     'extras.exporttemplate',
     'extras.imageattachment',
-    'virtualization.clustergroup',
-    'ipam.prefix',
-    'ipam.asn',
-    'dcim.virtualchassis',
-    'dcim.modulebaytemplate',
-    'ipam.asnrange',
-    'circuits.virtualcircuittermination',
-    'ipam.iprange',
-    'dcim.consoleport',
-    'extras.customfieldchoiceset',
-    'circuits.providernetwork',
-    'circuits.circuitgroupassignment',
-    'dcim.inventoryitemrole',
-    'dcim.rearporttemplate',
-    'circuits.provider',
-    'virtualization.clustertype',
-    'circuits.circuittermination',
-    'dcim.racktype',
-    'dcim.powerport',
-    'ipam.servicetemplate',
-    'circuits.circuittype',
-    'dcim.interfacetemplate',
-    'dcim.rackreservation',
-    'dcim.module',
-    'ipam.vlantranslationpolicy',
-    'circuits.provideraccount',
-    'dcim.devicebay',
-    'dcim.cable',
-    'ipam.vlangroup',
-    'dcim.consoleserverporttemplate',
-    'tenancy.contactassignment',
-    'virtualization.virtualmachine',
-    'ipam.routetarget',
-    'dcim.manufacturer',
-    'virtualization.virtualdisk',
-    'dcim.powerpanel',
-    'circuits.circuit',
-    'dcim.rackrole',
-    'tenancy.contactrole',
-    'dcim.macaddress',
-    'ipam.rir',
-    'dcim.consoleporttemplate',
-    'tenancy.contactgroup',
-    'circuits.circuitgroup',
-    'dcim.region',
-    'ipam.aggregate',
-    'dcim.devicetype',
-    'ipam.vlantranslationrule',
-    'dcim.modulebay',
-    'dcim.virtualdevicecontext',
+    'extras.journalentry',
     'extras.savedfilter',
-    'dcim.location',
-    'virtualization.vminterface',
-    'circuits.virtualcircuit',
+    'ipam.aggregate',
+    'ipam.asn',
+    'ipam.asnrange',
     'ipam.ipaddress',
-    'ipam.vrf',
-    'django_rq.queue',
-    'dcim.consoleserverport',
-    'ipam.service',
-    'dcim.powerfeed',
+    'ipam.iprange',
+    'ipam.prefix',
+    'ipam.rir',
     'ipam.role',
-    'dcim.devicerole'
+    'ipam.routetarget',
+    'ipam.service',
+    'ipam.servicetemplate',
+    'ipam.vlan',
+    'ipam.vlangroup',
+    'ipam.vlantranslationpolicy',
+    'ipam.vlantranslationrule',
+    'ipam.vrf',
+    'tenancy.contact',
+    'tenancy.contactassignment',
+    'tenancy.contactgroup',
+    'tenancy.contactrole',
+    'virtualization.cluster',
+    'virtualization.clustergroup',
+    'virtualization.clustertype',
+    'virtualization.virtualdisk',
+    'virtualization.vminterface',
 }
 
-root_objects = common_objects.union({
-    'extras.webhook',
-    'extras.customlink',
-    'core.datafile',
-    'extras.eventrule',
-    'extras.dashboard',
-    'extras.notificationgroup',
-    'vpn.tunneltermination',
-    'users.objectpermission',
-    'users.user',
-    'vpn.l2vpntermination',
-    'social_django.code',
-    'vpn.ikepolicy',
-    'tenancy.tenantgroup',
-    'db.testmodel',
-    'extras.cachedvalue',
-    'core.datasource',
-    'core.objecttype',
-    'users.token',
-    'vpn.l2vpn',
-    'users.group',
-    'vpn.tunnel',
-    'vpn.ipsecprofile',
-    'wireless.wirelesslink',
-    'extras.script',
-    'extras.configcontext',
-    'social_django.nonce',
-    'core.objectchange',
-    'core.managedfile',
-    'vpn.ipsecproposal',
-    'wireless.wirelesslan',
-    'social_django.partial',
-    'vpn.tunnelgroup',
-    'extras.tag',
+protected_objects = {
+    'dcim.device',
+    'virtualization.virtualmachine',
+}
+
+root_objects = common_objects | protected_objects | {
+    'core.autosyncrecord',
     'core.configrevision',
-    'extras.notification',
-    'tenancy.tenant',
-    'social_django.association',
-    'ipam.fhrpgroupassignment',
-    'wireless.wirelesslangroup',
-    'ipam.fhrpgroup',
-    'extras.configtemplate',
-    'vpn.ipsecpolicy',
-    'extras.bookmark',
+    'core.datafile',
+    'core.datasource',
     'core.job',
+    'core.managedfile',
+    'core.objectchange',
+    'core.objecttype',
+    'db.testmodel',
+    'extras.bookmark',
+    'extras.cachedvalue',
+    'extras.configcontext',
+    'extras.configtemplate',
     'extras.customfield',
-    'extras.subscription',
-    'vpn.ikeproposal',
+    'extras.customlink',
+    'extras.dashboard',
+    'extras.eventrule',
+    'extras.notification',
+    'extras.notificationgroup',
+    'extras.script',
     'extras.scriptmodule',
+    'extras.subscription',
+    'extras.tag',
     'extras.taggeditem',
+    'extras.webhook',
+    'ipam.fhrpgroup',
+    'ipam.fhrpgroupassignment',
+    'social_django.association',
+    'social_django.code',
+    'social_django.nonce',
+    'social_django.partial',
     'social_django.usersocialauth',
-    'core.autosyncrecord'
-})
+    'tenancy.tenant',
+    'tenancy.tenantgroup',
+    'users.group',
+    'users.objectpermission',
+    'users.token',
+    'users.user',
+    'vpn.ikepolicy',
+    'vpn.ikeproposal',
+    'vpn.ipsecpolicy',
+    'vpn.ipsecprofile',
+    'vpn.ipsecproposal',
+    'vpn.l2vpn',
+    'vpn.l2vpntermination',
+    'vpn.tunnel',
+    'vpn.tunnelgroup',
+    'vpn.tunneltermination',
+    'wireless.wirelesslan',
+    'wireless.wirelesslangroup',
+    'wireless.wirelesslink',
+}
 
 user_rw_objects = common_objects.union({
+    'netbox_documents.devicedocument',
     'netbox_documents.devicetypedocument',
+    'netbox_documents.locationdocument',
     'netbox_documents.sitedocument',
     'netbox_documents.vmdocument',
-    'netbox_documents.locationdocument',
-    'netbox_documents.devicedocument'}
-)
+})
 
 user_ro_objects = {
-    'extras.tag',
     'extras.customfield',
+    'extras.tag',
+    'tenancy.tenant',
     'tenancy.tenantgroup',
-    'tenancy.tenant'
 }
 
-actions_readonly = {'view'}
-actions_edit = {'view', 'add', 'change', 'delete' }
+actions_edit = {'view', 'add', 'change'}
 
-create_permission(name='root', actions=actions_edit, objects=root_objects, groups={group_admins})
-create_permission(name='user-rw', actions=actions_edit, objects=user_rw_objects, groups={group_users})
-create_permission(name='user-ro', actions=actions_readonly, objects=user_ro_objects, groups={group_users})
+permissions = {
+        'root': {
+            'actions': actions_edit,
+            'objects': root_objects,
+            'groups': {groups['admins']},
+        },
+        'user-rw': {
+            'actions': actions_edit,
+            'objects': protected_objects,
+            'groups': {groups['default-users']},
+        },
+        'user-rwd': {
+            'actions': actions_edit | {'delete'},
+            'objects': user_rw_objects,
+            'groups': {groups['default-users']},
+        },
+        'user-ro': {
+            'actions': {'view'},
+            'objects': user_ro_objects,
+            'groups': {groups['default-users']},
+        },
+}
+
+found_permissions = []
+for permission in ObjectPermission.objects.all():
+    if permission.name not in permissions or permission.name in found_permissions:
+        permission.delete()
+    found_permissions.append(permission.name)
+del found_permissions
+
+for permission, permission_data in permissions.items():
+    create_permission(
+            name=permission,
+            **permission_data,
+    )
