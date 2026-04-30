@@ -9,12 +9,10 @@ from users.models import Token, User
 # Read secret from file
 def _read_secret(secret_name: str, default: str | None = None) -> str | None:
     try:
-        f = open("/run/secrets/" + secret_name, "r", encoding="utf-8")
-    except EnvironmentError:
-        return default
-    else:
-        with f:
+        with open('/run/secrets/' + secret_name, encoding='utf-8') as f:
             return f.readline().strip()
+    except OSError:
+        return default
 
 
 su_name = environ.get('SUPERUSER_NAME', 'admin')
