@@ -165,16 +165,6 @@ FIELD_CHOICES = {
         ('disposed', 'Disposed of', 'orange'),
         ('unused', 'Active, Unused', 'teal'),
     ),
-    'netbox_documents.DocTypeChoices.device': (
-        ('datasheet', 'Data Sheet', 'green'),
-        ('invoice', 'Invoice', 'gold'),
-        ('manual', 'Manual', 'pink'),
-        ('packingslip', 'Packing Slip', 'grey'),
-        ('purchaseorder', 'Purchase Order', 'orange'),
-        ('quote', 'Quote', 'silver'),
-        ('service', 'Service Agreement', 'blue'),
-        ('warranty', 'Warranty information or RMA', 'red'),
-    ),
 }
 
 SOCIAL_AUTH_BACKEND_ATTRS = {
