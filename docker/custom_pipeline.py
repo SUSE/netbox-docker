@@ -1,8 +1,9 @@
 from netbox.authentication import Group
+from os import getenv
 
-NETBOX_ADMIN_GROUP = 'admins'
-SUSEID_ADMIN_GROUP = 'app-netbox-admins'
-DEFAULT_GROUP = 'default-users'
+NETBOX_ADMIN_GROUP = getenv('NB_PIPELINE_NB_ADMIN_GROUP', 'admins')
+SUSEID_ADMIN_GROUP = getenv('NB_PIPELINE_IDP_ADMIN_GROUP', 'app-netbox-admins')
+DEFAULT_GROUP = getenv('NB_PIPELINE_NB_DEFAULT_GROUP', 'default-users')
 
 class AuthFailed(Exception):
     pass
