@@ -188,11 +188,7 @@ root_objects = common_objects | protected_objects | {
 }
 
 user_rw_objects = common_objects.union({
-    'netbox_documents.devicedocument',
-    'netbox_documents.devicetypedocument',
-    'netbox_documents.locationdocument',
-    'netbox_documents.sitedocument',
-    'netbox_documents.vmdocument',
+    'netbox_documents.document',
 })
 
 user_ro_objects = {

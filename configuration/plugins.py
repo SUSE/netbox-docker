@@ -19,14 +19,33 @@ PLUGINS = [
 PLUGINS_CONFIG = {
             'netbox_healthcheck_plugin': {},
             'netbox_documents': {
-                'device_documents_location': 'left',
-                'enable_circuit_documents': False,
-                'enable_circuit_provider_documents': False,
-                'enable_device_documents': True,
-                'enable_device_type_documents': False,
-                'enable_location_documents': False,
                 'enable_navigation_menu': False,
-                'enable_site_documents': False,
-                'enable_vm_documents': False,
+                'documents_location': 'left',
+
+                'custom_doc_types': [
+                    ('datasheet', 'Data Sheet', 'green'),
+                    ('invoice', 'Invoice', 'gold'),
+                    ('manual', 'Manual', 'pink'),
+                    ('packingslip', 'Packing Slip', 'grey'),
+                    ('purchaseorder', 'Purchase Order', 'orange'),
+                    ('quote', 'Quote', 'silver'),
+                    ('service', 'Service Agreement', 'blue'),
+                    ('warranty', 'Warranty information or RMA', 'red'),
+                ],
+
+                'allowed_doc_types': {
+                    '__all__': [],
+                    'dcim.device': [
+                        'datasheet',
+                        'invoice',
+                        'manual',
+                        'packingslip',
+                        'purchaseorder',
+                        'quote',
+                        'service',
+                        'warranty',
+                    ],
+                },
+
             },
 }
