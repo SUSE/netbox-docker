@@ -54,12 +54,12 @@ RUN \
       catatonit \
     && zypper -n cc -a && rm -r /var/{cache,log}/*
 
-# Copy the modified 'requirements*.txt' files, to have the files actually used during installation
-COPY --from=builder /requirements.txt /requirements-container.txt /opt/netbox/
 COPY --from=builder /opt/netbox/venv /opt/netbox/venv
 
 ARG NETBOX_PATH
 COPY ${NETBOX_PATH} /opt/netbox
+# Copy the modified 'requirements*.txt' files, to have the files actually used during installation
+COPY --from=builder /requirements.txt /requirements-container.txt /opt/netbox/
 
 COPY docker/configuration.docker.py /opt/netbox/netbox/netbox/configuration.py
 COPY docker/ldap_config.docker.py /opt/netbox/netbox/netbox/ldap_config.py
