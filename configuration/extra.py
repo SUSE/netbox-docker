@@ -55,6 +55,8 @@
 # now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 # BANNER_TOP = f'<marquee width="200px">This instance started on {now}.</marquee>'
 
+from os import getenv
+
 DEFAULT_DASHBOARD = [
     {
         'widget': 'extras.BookmarksWidget',
@@ -168,5 +170,5 @@ FIELD_CHOICES = {
 }
 
 SOCIAL_AUTH_BACKEND_ATTRS = {
-    'oidc': ('Log in with SUSEID', 'login'),
+    'oidc': (getenv('NB_LOGIN_BUTTON_TEXT', 'Log in with SUSEID'), 'login'),
 }
