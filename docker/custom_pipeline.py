@@ -1,12 +1,15 @@
-from netbox.authentication import Group
 from os import getenv
+
+from netbox.authentication import Group
 
 NETBOX_ADMIN_GROUP = getenv('NB_PIPELINE_NB_ADMIN_GROUP', 'admins')
 SUSEID_ADMIN_GROUP = getenv('NB_PIPELINE_IDP_ADMIN_GROUP', 'app-netbox-admins')
 DEFAULT_GROUP = getenv('NB_PIPELINE_NB_DEFAULT_GROUP', 'default-users')
 
+
 class AuthFailed(Exception):
     pass
+
 
 def update_groups(response, user, backend, *args, **kwargs):
 
@@ -29,7 +32,7 @@ def update_groups(response, user, backend, *args, **kwargs):
 
     # User is not in netbox admin group but should be. Update memberships.
     if SUSEID_ADMIN_GROUP in groups and NETBOX_ADMIN_GROUP not in user_groups:
-        group, created = Group.objects.get_or_create(name=NETBOX_ADMIN_GROUP)
+        group, _ = Group.objects.get_or_create(name=NETBOX_ADMIN_GROUP)
         user.groups.add(group)
         updated_user = True
 
@@ -41,7 +44,7 @@ def update_groups(response, user, backend, *args, **kwargs):
 
     # Add default group if not already done.
     if DEFAULT_GROUP not in user_groups:
-        group, created = Group.objects.get_or_create(name=DEFAULT_GROUP)
+        group, _ = Group.objects.get_or_create(name=DEFAULT_GROUP)
         user.groups.add(group)
         updated_user = True
 
