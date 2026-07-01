@@ -1,0 +1,20 @@
+os: linux
+dist: noble
+
+language: python
+python:
+  - 3.13
+
+install:
+  # align with upstream super-linter version
+  # https://github.com/super-linter/super-linter/blob/v8.7.0/dependencies/python/ruff.txt
+  - pip install ruff==0.15.17
+  - sudo cp -r env /etc/opt/netbox-docker
+
+services:
+  - docker
+
+script:
+  - ruff check
+  - TAG=0.0.0 docker compose build --check
+  - TAG=0.0.0 docker compose up --build --dry-run
