@@ -17,6 +17,7 @@ services:
     env_file: /etc/opt/netbox-docker/netbox.env
     build:
       args:
+        BUILDKIT_DOCKERFILE_CHECK: skip=InvalidDefaultArgInFrom
         FROM: registry.suse.com/bci/python:3.13
         NETBOX_PATH: ${NETBOX_PATH}
       context: .
