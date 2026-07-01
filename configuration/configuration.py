@@ -392,7 +392,7 @@ ISOLATED_DEPLOYMENT = _environ_get_and_map('ISOLATED_DEPLOYMENT', 'False', _AS_B
 # Enables or disables the NetBox Copilot agent globally. When enabled, users can opt to toggle the agent individually.
 COPILOT_ENABLED = _environ_get_and_map('COPILOT_ENABLED', 'True', _AS_BOOL)
 
-SOCIAL_AUTH_OPENSUSE_WHITELISTED_DOMAINS = [ 'suse.com' ]
+SOCIAL_AUTH_OPENSUSE_WHITELISTED_DOMAINS = ['suse.com']
 SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
 SOCIAL_AUTH_OPENSUSE_USERNAME_IS_FULL_EMAIL = True
 

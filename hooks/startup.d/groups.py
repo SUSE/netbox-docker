@@ -1,6 +1,6 @@
 from core.models import ObjectType
-from users.models import Group, ObjectPermission
 from django.apps import apps
+from users.models import Group, ObjectPermission
 
 groups = {
         'admins': None,
@@ -17,6 +17,7 @@ del found_groups
 for group in groups:
     groups[group], _ = Group.objects.get_or_create(name=group)
 
+
 def name_to_object(name: str):
     try:
         model = apps.get_model(name)
@@ -24,13 +25,14 @@ def name_to_object(name: str):
         return None
     return ObjectType.objects.get_for_model(model)
 
+
 def create_permission(name: str, actions: set[str], objects: set[str], groups: set[Group]):
     # Check if it already exists
     objectpermission, _ = ObjectPermission.objects.update_or_create(
         name=name,
         defaults={'actions': list(actions)},
     )
-    objectpermission.object_types.set([ name_to_object(x) for x in objects if  name_to_object(x) is not None])
+    objectpermission.object_types.set([name_to_object(x) for x in objects if name_to_object(x) is not None])
     # Save to make sure the object has an id before adding group relationships
     objectpermission.save()
     for group in groups:
