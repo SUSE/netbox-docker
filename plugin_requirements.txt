@@ -1,2 +1,2 @@
-git+https://github.com/tacerus/netbox-healthcheck-plugin@suse-main
-git+https://github.com/tacerus/netbox-documents@suse-main
+git+https://github.com/SUSE/netbox-healthcheck-plugin@suse-main
+git+https://github.com/SUSE/netbox-documents@suse-main
