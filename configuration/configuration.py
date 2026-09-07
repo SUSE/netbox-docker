@@ -157,6 +157,11 @@ if 'BANNER_TOP' in environ:
 if 'BANNER_BOTTOM' in environ:
     BANNER_BOTTOM = environ.get('BANNER_BOTTOM', None)
 
+# Change the maintenance banner text when MAINTENANCE_MODE is enabled.
+# This allows you to provide custom instructions to users when the system is in maintenance mode.
+if 'BANNER_MAINTENANCE' in environ:
+    BANNER_MAINTENANCE = environ.get('BANNER_MAINTENANCE', None)
+
 # Text to include on the login page above the login form. HTML is allowed.
 if 'BANNER_LOGIN' in environ:
     BANNER_LOGIN = environ.get('BANNER_LOGIN', None)
@@ -164,6 +169,10 @@ if 'BANNER_LOGIN' in environ:
 # Maximum number of days to retain logged changes. Set to 0 to retain changes indefinitely. (Default: 90)
 if 'CHANGELOG_RETENTION' in environ:
     CHANGELOG_RETENTION = _environ_get_and_map('CHANGELOG_RETENTION', None, _AS_INT)
+
+# When pruning retain each non-deleted object's original create change record and its most recent update change record. (Default: False)
+if 'CHANGELOG_RETAIN_CREATE_LAST_UPDATE' in environ:
+    CHANGELOG_RETAIN_CREATE_LAST_UPDATE = _environ_get_and_map('CHANGELOG_RETAIN_CREATE_LAST_UPDATE', 'False', _AS_BOOL)
 
 # Maximum number of days to retain job results (scripts and reports). Set to 0 to retain job results in the database indefinitely. (Default: 90)
 if 'JOB_RETENTION' in environ:
