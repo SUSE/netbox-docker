@@ -64,7 +64,7 @@ services:
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
     restart: unless-stopped
   traefik:
-    image: traefik:v2.8
+    image: traefik:v3.7
     container_name: traefik
     hostname: traefik
     command:
