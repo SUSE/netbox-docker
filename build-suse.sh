@@ -6,6 +6,13 @@ URL="${URL-https://github.com/${SRC_ORG}/${SRC_REPO}.git}"
 
 NETBOX_BRANCH="${1}"
 NETBOX_PATH="${NETBOX_PATH-../netbox-git}"
+NETBOX_BUILD_BACKEND="${NETBOX_BUILD_BACKEND-docker}"
+
+case "$NETBOX_BUILD_BACKEND" in
+	docker ) cmd=docker-compose ;;
+	podman ) cmd=podman-compose ;;
+	* ) echo "Unknown backend: $NETBOX_BUILD_BACKEND" ; exit 1 ;;
+esac
 
 git clone -q --depth 10 -b "${NETBOX_BRANCH}" "${URL}" "${NETBOX_PATH}"
 git -C "${NETBOX_PATH}/.git" fetch -qp --depth 10 origin "${NETBOX_BRANCH}"
@@ -25,6 +32,6 @@ TAG="${NETBOX_BRANCH}-suse"
 mv "$NETBOX_PATH" .netbox
 NETBOX_PATH='.netbox'
 
-NETBOX_PATH="$NETBOX_PATH" TAG="$TAG" docker-compose build
+NETBOX_PATH="$NETBOX_PATH" TAG="$TAG" "$cmd" build
 
 rm -r "$NETBOX_PATH"
