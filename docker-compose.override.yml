@@ -10,7 +10,7 @@ services:
     command: "true"
     entrypoint: "true"
     healthcheck:
-      test: ["NONE"]
+      test: "NONE"
     volumes: []
   # "Real" overrides below
   netbox:
