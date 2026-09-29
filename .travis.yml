@@ -16,5 +16,4 @@ services:
 
 script:
   - ruff check
-  - TAG=0.0.0 docker compose build --check
-  - TAG=0.0.0 docker compose up --build --dry-run
+  - IMAGE=docker.io/netboxcommunity/netbox TAG=latest docker compose up --build --dry-run

@@ -15,16 +15,8 @@ services:
   # "Real" overrides below
   netbox:
     env_file: /etc/opt/netbox-docker/netbox.env
-    build:
-      args:
-        BUILDKIT_DOCKERFILE_CHECK: skip=InvalidDefaultArgInFrom
-        FROM: registry.suse.com/bci/python:3.13
-        NETBOX_PATH: ${NETBOX_PATH}
-      context: .
-      dockerfile: Dockerfile
-      target: main
-    image: netbox:${TAG}
-    pull_policy: never
+    image: &image ${IMAGE}:${TAG}
+    pull_policy: &pull_policy always
     ports:
       - 8000:8080
     labels:
@@ -57,8 +49,8 @@ services:
     restart: unless-stopped
   netbox-worker:
     env_file: /etc/opt/netbox-docker/netbox.env
-    image: netbox:${TAG}
-    pull_policy: never
+    image: *image
+    pull_policy: *pull_policy
     volumes:
       - /var/opt/netbox/data-source:/var/opt/netbox/data-source:ro
       - /etc/ssl/ca-bundle.pem:/etc/ssl/ca-bundle.pem:ro
