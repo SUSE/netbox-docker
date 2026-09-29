@@ -16,4 +16,5 @@ services:
 
 script:
   - ruff check
+  - printenv DOCKER_PASSWORD_APPCO | docker login -u $DOCKER_USERNAME_APPCO --password-stdin dp.apps.rancher.io
   - IMAGE=docker.io/netboxcommunity/netbox TAG=latest docker compose up --build --dry-run
